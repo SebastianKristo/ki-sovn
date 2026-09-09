@@ -1,3 +1,5 @@
+<p align="center"><img src="icon.png" width="128" alt="KI Søvn"></p>
+
 # KI Søvn
 
 Custom integration for Home Assistant som avgjør automatisk om en person sover, og
@@ -40,3 +42,15 @@ Sannsynligheten regnes bayesiansk. Over terskel i *N* min → sover, under tersk
 | dør om natta OK | – | nei | ja |
 | terskel | 0.8 | 0.8 | 0.75 |
 | puls sover/våken | 54 / 65 | – | – |
+
+## Ikon
+Ikonet ligger i `brand/ki_sovn/` (`icon.png` 256×256, `icon@2x.png` 512×512, kilde `icon.svg`).
+
+Home Assistant og HACS henter ikoner fra <https://github.com/home-assistant/brands>, ikke fra selve integrasjonen.
+For at ikonet skal vises i integrasjonsmenyen og i HACS må det sendes inn dit én gang:
+
+1. Fork `home-assistant/brands`
+2. Legg `icon.png` og `icon@2x.png` i `custom_integrations/ki_sovn/`
+3. Åpne en PR – etter merge vises ikonet automatisk (cache kan ta noen timer)
+
+Inntil da viser HA et standard-ikon; README-bildet over vises uansett i HACS.
