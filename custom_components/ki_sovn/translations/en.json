@@ -88,7 +88,52 @@
     },
     "sensor": {
       "sannsynlighet": {
-        "name": "Søvn-sannsynlighet"
+        "name": "Sannsynlighet"
+      }
+    },
+    "number": {
+      "terskel": {
+        "name": "Terskel"
+      },
+      "forsinkelse_sovner": {
+        "name": "Forsinkelse sovner"
+      },
+      "forsinkelse_vaakner": {
+        "name": "Forsinkelse våkner"
+      },
+      "hold_i_rommet": {
+        "name": "Hold i rommet"
+      },
+      "borte_fra_rommet": {
+        "name": "Borte fra rommet = våken"
+      },
+      "dor_lukket_min": {
+        "name": "Dør lukket i"
+      },
+      "puls_sover": {
+        "name": "Puls sover"
+      },
+      "puls_vaaken": {
+        "name": "Puls våken"
+      }
+    },
+    "time": {
+      "sovevindu_start": {
+        "name": "Sovevindu start"
+      },
+      "sovevindu_slutt": {
+        "name": "Sovevindu slutt"
+      },
+      "morgen_fra": {
+        "name": "Morgen fra"
+      }
+    },
+    "switch": {
+      "automatisk": {
+        "name": "Automatisk"
+      },
+      "dor_om_natta_ok": {
+        "name": "Dør om natta OK"
       }
     }
   }

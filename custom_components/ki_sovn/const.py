@@ -27,6 +27,7 @@ CONF_BEDTIME_END = "bedtime_end"
 CONF_MORNING_FROM = "morning_from"      # dør åpnes etter dette = våken
 CONF_MORNING_TO = "morning_to"
 CONF_NIGHT_DOOR_OK = "night_door_ok"    # True: døra kan åpnes om natta (do) uten å vekke
+CONF_ENABLED = "enabled"                # False: beregner, men skriver ikke til bryteren
 
 # --- Terskler ---
 CONF_THRESHOLD = "threshold"            # 0–1
@@ -48,6 +49,7 @@ DEFAULTS = {
     CONF_MORNING_FROM: "05:00",
     CONF_MORNING_TO: "12:00",
     CONF_NIGHT_DOOR_OK: False,
+    CONF_ENABLED: True,
     CONF_THRESHOLD: 0.8,
     CONF_PRIOR: 0.25,
     CONF_ON_DELAY: 10,
@@ -73,4 +75,26 @@ PROB = {
     "puls_lav": (0.85, 0.15),
     "puls_hoy": (0.05, 0.50),
     "i_senga": (0.95, 0.10),
+}
+
+# Innstillinger som eksponeres som entiteter (number / time / switch)
+NUMBER_SETTINGS = {
+    # key: (translation_key, min, max, step, unit, scale)  scale: lagret = vist * scale
+    CONF_THRESHOLD: ("terskel", 50, 99, 1, "%", 0.01),
+    CONF_ON_DELAY: ("forsinkelse_sovner", 0, 60, 1, "min", 1),
+    CONF_OFF_DELAY: ("forsinkelse_vaakner", 0, 60, 1, "min", 1),
+    CONF_PRESENCE_HYST: ("hold_i_rommet", 0, 120, 5, "min", 1),
+    CONF_AWAY_ROOM_MIN: ("borte_fra_rommet", 5, 180, 5, "min", 1),
+    CONF_DOOR_CLOSED_MIN: ("dor_lukket_min", 0, 120, 5, "min", 1),
+    CONF_HR_SLEEP: ("puls_sover", 30, 100, 1, "bpm", 1),
+    CONF_HR_AWAKE: ("puls_vaaken", 40, 150, 1, "bpm", 1),
+}
+TIME_SETTINGS = {
+    CONF_BEDTIME_START: "sovevindu_start",
+    CONF_BEDTIME_END: "sovevindu_slutt",
+    CONF_MORNING_FROM: "morgen_fra",
+}
+SWITCH_SETTINGS = {
+    CONF_ENABLED: "automatisk",
+    CONF_NIGHT_DOOR_OK: "dor_om_natta_ok",
 }

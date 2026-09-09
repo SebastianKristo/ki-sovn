@@ -32,8 +32,14 @@ Sannsynligheten regnes bayesiansk. Over terskel i *N* min → sover, under tersk
 - Etter en tvungen vekking må sannsynligheten under terskel før «sover» kan settes igjen
 
 ## Entiteter
-- `binary_sensor.<navn>_sover` – med attributter: sannsynlighet, årsak, alle observasjoner
-- `sensor.<navn>_sovn_sannsynlighet` – prosent
+Enheten heter «<Navn> søvn», så entitetene blir f.eks. for Sebastian:
+- `binary_sensor.sebastian_sovn_sover` – med attributter: sannsynlighet, årsak, venter_på, alle observasjoner
+- `sensor.sebastian_sovn_sannsynlighet` – prosent
+- Innstillinger (kategori *konfigurasjon*, kan endres fra dashboardet uten reload):
+  `number.sebastian_sovn_terskel`, `_forsinkelse_sovner`, `_forsinkelse_vakner`, `_hold_i_rommet`,
+  `_borte_fra_rommet_vaken`, `_dor_lukket_i`, `_puls_sover`, `_puls_vaken`;
+  `time.sebastian_sovn_sovevindu_start`, `_sovevindu_slutt`, `_morgen_fra`;
+  `switch.sebastian_sovn_automatisk` (av = beregner, men rører ikke Homey-bryteren), `switch.sebastian_sovn_dor_om_natta_ok`
 
 ## Forslag til oppsett i dette huset
 | | Sebastian | Rune | Cybele |

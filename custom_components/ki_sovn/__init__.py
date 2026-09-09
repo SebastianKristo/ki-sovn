@@ -8,7 +8,7 @@ from homeassistant.core import HomeAssistant
 from .const import DOMAIN
 from .coordinator import SovnCoordinator
 
-PLATFORMS = [Platform.BINARY_SENSOR, Platform.SENSOR]
+PLATFORMS = [Platform.BINARY_SENSOR, Platform.SENSOR, Platform.NUMBER, Platform.TIME, Platform.SWITCH]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -21,6 +21,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    coordinator: SovnCoordinator | None = hass.data.get(DOMAIN, {}).get(entry.entry_id)
+    if coordinator and coordinator.self_update:
+        coordinator.self_update = False   # endring fra egen entitet – ingen reload nødvendig
+        return
     await hass.config_entries.async_reload(entry.entry_id)
 
 

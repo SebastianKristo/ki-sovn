@@ -22,6 +22,7 @@ from .const import (
     CONF_BEDTIME_START,
     CONF_DOOR,
     CONF_DOOR_CLOSED_MIN,
+    CONF_ENABLED,
     CONF_HEART_RATE,
     CONF_HOME_SWITCH,
     CONF_HR_AWAKE,
@@ -98,6 +99,7 @@ class SovnCoordinator:
         self._morning_door_opened: datetime | None = None
         self._hr_samples: deque[tuple[datetime, float]] = deque()
 
+        self.self_update = False
         self._listeners: set[Callable[[], None]] = set()
         self._unsubs: list[Callable[[], None]] = []
 
@@ -340,9 +342,18 @@ class SovnCoordinator:
         self._morning_door_opened = None
         _LOGGER.debug("%s vekket: %s", self.name, reason)
 
+    async def async_set_setting(self, key: str, value: Any) -> None:
+        """Endre en innstilling fra en entitet; lagres i options uten reload."""
+        self.cfg[key] = value
+        self.self_update = True
+        self.hass.config_entries.async_update_entry(
+            self.entry, options={**self.entry.options, key: value}
+        )
+        await self._evaluate()
+
     async def _write_switch(self) -> None:
         ent = self._entity(CONF_SLEEP_SWITCH)
-        if not ent:
+        if not ent or not self.cfg.get(CONF_ENABLED, True):
             return
         st = self.hass.states.get(ent)
         desired = "on" if self.sleeping else "off"
