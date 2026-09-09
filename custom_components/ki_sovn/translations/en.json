@@ -2,6 +2,13 @@
   "config": {
     "step": {
       "user": {
+        "title": "KI Søvn & Vekking",
+        "menu_options": {
+          "person": "Person – søvndeteksjon",
+          "vekking": "Vekkealarm – gradvis lys"
+        }
+      },
+      "person": {
         "title": "Person og sensorer",
         "data": {
           "name": "Navn",
@@ -34,16 +41,27 @@
           "hr_awake_bpm": "Puls over dette = våken",
           "hr_fresh_min": "Pulsverdi må være nyere enn",
           "hr_window_min": "Glattingsvindu for puls"
+        }
+      },
+      "vekking": {
+        "title": "Vekkealarm",
+        "data": {
+          "name": "Navn (f.eks. Soverom)",
+          "lights": "Lys som fades opp",
+          "night_light": "Nattlampe (valgfri, styres av bryteren «Nattlampe»)",
+          "conditions": "Betingelser – alle må være på for at alarmen skal gå",
+          "person": "Person (søvn-sensor) – vekkes når lyset er oppe, og alarmen kan hoppes over hvis personen er våken",
+          "start_pct": "Startlysstyrke før fade"
         }
       }
     },
     "abort": {
-      "already_configured": "Denne personen er allerede satt opp"
+      "already_configured": "Denne oppføringen finnes allerede"
     }
   },
   "options": {
     "step": {
-      "init": {
+      "person": {
         "title": "Person og sensorer",
         "data": {
           "name": "Navn",
@@ -76,6 +94,17 @@
           "hr_awake_bpm": "Puls over dette = våken",
           "hr_fresh_min": "Pulsverdi må være nyere enn",
           "hr_window_min": "Glattingsvindu for puls"
+        }
+      },
+      "vekking": {
+        "title": "Vekkealarm",
+        "data": {
+          "name": "Navn (f.eks. Soverom)",
+          "lights": "Lys som fades opp",
+          "night_light": "Nattlampe (valgfri, styres av bryteren «Nattlampe»)",
+          "conditions": "Betingelser – alle må være på for at alarmen skal gå",
+          "person": "Person (søvn-sensor) – vekkes når lyset er oppe, og alarmen kan hoppes over hvis personen er våken",
+          "start_pct": "Startlysstyrke før fade"
         }
       }
     }
@@ -84,11 +113,17 @@
     "binary_sensor": {
       "sover": {
         "name": "Sover"
+      },
+      "kjorer": {
+        "name": "Kjører"
       }
     },
     "sensor": {
       "sannsynlighet": {
         "name": "Sannsynlighet"
+      },
+      "neste_alarm": {
+        "name": "Neste alarm"
       }
     },
     "number": {
@@ -115,6 +150,12 @@
       },
       "puls_vaaken": {
         "name": "Puls våken"
+      },
+      "fade_opp": {
+        "name": "Fade opp"
+      },
+      "av_etter": {
+        "name": "Av etter"
       }
     },
     "time": {
@@ -126,6 +167,27 @@
       },
       "morgen_fra": {
         "name": "Morgen fra"
+      },
+      "mandag": {
+        "name": "Mandag"
+      },
+      "tirsdag": {
+        "name": "Tirsdag"
+      },
+      "onsdag": {
+        "name": "Onsdag"
+      },
+      "torsdag": {
+        "name": "Torsdag"
+      },
+      "fredag": {
+        "name": "Fredag"
+      },
+      "lordag": {
+        "name": "Lørdag"
+      },
+      "sondag": {
+        "name": "Søndag"
       }
     },
     "switch": {
@@ -134,6 +196,53 @@
       },
       "dor_om_natta_ok": {
         "name": "Dør om natta OK"
+      },
+      "aktiv": {
+        "name": "Aktiv"
+      },
+      "nattlampe": {
+        "name": "Nattlampe"
+      },
+      "vekk_person": {
+        "name": "Vekk person"
+      },
+      "bare_hvis_sover": {
+        "name": "Bare hvis sover"
+      },
+      "mandag_aktiv": {
+        "name": "Mandag aktiv"
+      },
+      "tirsdag_aktiv": {
+        "name": "Tirsdag aktiv"
+      },
+      "onsdag_aktiv": {
+        "name": "Onsdag aktiv"
+      },
+      "torsdag_aktiv": {
+        "name": "Torsdag aktiv"
+      },
+      "fredag_aktiv": {
+        "name": "Fredag aktiv"
+      },
+      "lordag_aktiv": {
+        "name": "Lørdag aktiv"
+      },
+      "sondag_aktiv": {
+        "name": "Søndag aktiv"
+      }
+    },
+    "button": {
+      "test": {
+        "name": "Test"
+      },
+      "stopp": {
+        "name": "Stopp"
+      },
+      "sett_sover": {
+        "name": "Sett sover"
+      },
+      "sett_vaaken": {
+        "name": "Sett våken"
       }
     }
   }

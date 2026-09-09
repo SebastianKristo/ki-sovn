@@ -1,37 +1,47 @@
-"""Switch-entiteter: automatisk styring og dør-om-natta."""
+"""Brytere: person-innstillinger, vekking master/nattlampe/ukedager/person-kobling."""
 from __future__ import annotations
 
 from homeassistant.components.switch import SwitchEntity
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import DOMAIN, SWITCH_SETTINGS
-from .coordinator import SovnCoordinator
-from .entity import SovnEntity
+from .const import (
+    DAYS, DOMAIN, KIND_PERSON, OPT_MASTER, OPT_NIGHT_LIGHT_ON, OPT_ONLY_IF_ASLEEP, OPT_WAKE_PERSON,
+    PERSON_SWITCHES, opt_active,
+)
+from .entity import SovnEntity, VekkingEntity
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback) -> None:
-    coordinator: SovnCoordinator = hass.data[DOMAIN][entry.entry_id]
-    async_add_entities(SettingSwitch(coordinator, key, tkey) for key, tkey in SWITCH_SETTINGS.items())
+async def async_setup_entry(hass: HomeAssistant, entry, async_add_entities: AddEntitiesCallback) -> None:
+    c = hass.data[DOMAIN][entry.entry_id]
+    if c.kind == KIND_PERSON:
+        async_add_entities(OptSwitch(SovnEntity, c, key, tkey, None, EntityCategory.CONFIG) for key, tkey in PERSON_SWITCHES.items())
+        return
+    ents = [OptSwitch(VekkingEntity, c, OPT_MASTER, "aktiv", "mdi:alarm-check", None),
+            OptSwitch(VekkingEntity, c, OPT_NIGHT_LIGHT_ON, "nattlampe", "mdi:lamp", EntityCategory.CONFIG),
+            OptSwitch(VekkingEntity, c, OPT_WAKE_PERSON, "vekk_person", "mdi:account-alert", EntityCategory.CONFIG),
+            OptSwitch(VekkingEntity, c, OPT_ONLY_IF_ASLEEP, "bare_hvis_sover", "mdi:sleep", EntityCategory.CONFIG)]
+    ents += [OptSwitch(VekkingEntity, c, opt_active(d), f"{d}_aktiv", "mdi:calendar-check", EntityCategory.CONFIG) for d in DAYS]
+    async_add_entities(ents)
 
 
-class SettingSwitch(SovnEntity, SwitchEntity):
-    _attr_entity_category = EntityCategory.CONFIG
+def OptSwitch(base, c, key, tkey, icon, category):  # noqa: N802 – fabrikk for begge basene
+    class _Switch(base, SwitchEntity):
+        def __init__(self) -> None:
+            super().__init__(c, key, tkey)
+            if icon:
+                self._attr_icon = icon
+            self._attr_entity_category = category
 
-    def __init__(self, coordinator, key, tkey) -> None:
-        super().__init__(coordinator)
-        self._key = key
-        self._attr_translation_key = tkey
-        self._attr_unique_id = f"{coordinator.entry.entry_id}_{key}"
+        @property
+        def is_on(self) -> bool:
+            return bool(self.coordinator.cfg.get(key, True if key == "enabled" else False))
 
-    @property
-    def is_on(self) -> bool:
-        return bool(self.coordinator.cfg.get(self._key, True))
+        async def async_turn_on(self, **kwargs) -> None:
+            await self.coordinator.async_set_setting(key, True)
 
-    async def async_turn_on(self, **kwargs) -> None:
-        await self.coordinator.async_set_setting(self._key, True)
+        async def async_turn_off(self, **kwargs) -> None:
+            await self.coordinator.async_set_setting(key, False)
 
-    async def async_turn_off(self, **kwargs) -> None:
-        await self.coordinator.async_set_setting(self._key, False)
+    return _Switch()
