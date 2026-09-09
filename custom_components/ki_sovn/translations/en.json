@@ -1,0 +1,95 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Person og sensorer",
+        "data": {
+          "name": "Navn",
+          "home_switch": "Hjemme/borte (on = hjemme)",
+          "sleep_switch": "Søvn/våken-bryter som skal styres (on = sover)",
+          "presence_sensor": "Tilstedeværelse på soverommet",
+          "door_sensor": "Dørsensor soverom",
+          "window_sensor": "Vindussensor soverom",
+          "heart_rate_sensor": "Puls (bpm)",
+          "bed_sensor": "Sengesensor"
+        }
+      },
+      "tider": {
+        "title": "Tider og terskler",
+        "data": {
+          "bedtime_start": "Sovevindu starter",
+          "bedtime_end": "Sovevindu slutter",
+          "night_door_ok": "Døra kan åpnes om natta uten å vekke (do-turer)",
+          "morning_from": "Morgen fra (dør åpnes = våken)",
+          "morning_to": "Morgen til",
+          "threshold": "Terskel for «sover» (0–1)",
+          "prior": "Forhåndssannsynlighet",
+          "on_delay_min": "Forsinkelse før «sover»",
+          "off_delay_min": "Forsinkelse før «våken»",
+          "presence_hyst_min": "Hold «i rommet» etter siste deteksjon",
+          "away_room_min": "Borte fra rommet så lenge = våken",
+          "morning_away_min": "Borte etter morgen-døråpning = våken",
+          "door_closed_min": "Dør lukket så lenge teller som stengt",
+          "hr_sleep_bpm": "Puls under dette = sover",
+          "hr_awake_bpm": "Puls over dette = våken",
+          "hr_fresh_min": "Pulsverdi må være nyere enn",
+          "hr_window_min": "Glattingsvindu for puls"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "Denne personen er allerede satt opp"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Person og sensorer",
+        "data": {
+          "name": "Navn",
+          "home_switch": "Hjemme/borte (on = hjemme)",
+          "sleep_switch": "Søvn/våken-bryter som skal styres (on = sover)",
+          "presence_sensor": "Tilstedeværelse på soverommet",
+          "door_sensor": "Dørsensor soverom",
+          "window_sensor": "Vindussensor soverom",
+          "heart_rate_sensor": "Puls (bpm)",
+          "bed_sensor": "Sengesensor"
+        }
+      },
+      "tider": {
+        "title": "Tider og terskler",
+        "data": {
+          "bedtime_start": "Sovevindu starter",
+          "bedtime_end": "Sovevindu slutter",
+          "night_door_ok": "Døra kan åpnes om natta uten å vekke (do-turer)",
+          "morning_from": "Morgen fra (dør åpnes = våken)",
+          "morning_to": "Morgen til",
+          "threshold": "Terskel for «sover» (0–1)",
+          "prior": "Forhåndssannsynlighet",
+          "on_delay_min": "Forsinkelse før «sover»",
+          "off_delay_min": "Forsinkelse før «våken»",
+          "presence_hyst_min": "Hold «i rommet» etter siste deteksjon",
+          "away_room_min": "Borte fra rommet så lenge = våken",
+          "morning_away_min": "Borte etter morgen-døråpning = våken",
+          "door_closed_min": "Dør lukket så lenge teller som stengt",
+          "hr_sleep_bpm": "Puls under dette = sover",
+          "hr_awake_bpm": "Puls over dette = våken",
+          "hr_fresh_min": "Pulsverdi må være nyere enn",
+          "hr_window_min": "Glattingsvindu for puls"
+        }
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "sover": {
+        "name": "Sover"
+      }
+    },
+    "sensor": {
+      "sannsynlighet": {
+        "name": "Søvn-sannsynlighet"
+      }
+    }
+  }
+}
