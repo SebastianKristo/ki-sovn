@@ -44,12 +44,10 @@ def _ent(domain: str | list[str]) -> selector.EntitySelector:
 
 
 def _num(min_: float, max_: float, step: float = 1, unit: str | None = None) -> selector.NumberSelector:
-    return selector.NumberSelector(
-        selector.NumberSelectorConfig(
-            min=min_, max=max_, step=step, mode=selector.NumberSelectorMode.BOX,
-            unit_of_measurement=unit,
-        )
-    )
+    cfg: dict[str, Any] = {"min": min_, "max": max_, "step": step, "mode": selector.NumberSelectorMode.BOX}
+    if unit:
+        cfg["unit_of_measurement"] = unit
+    return selector.NumberSelector(selector.NumberSelectorConfig(**cfg))
 
 
 def _time() -> selector.TimeSelector:
@@ -60,7 +58,7 @@ def person_schema(d: dict[str, Any]) -> vol.Schema:
     return vol.Schema(
         {
             vol.Required(CONF_NAME, default=d.get(CONF_NAME, "")): str,
-            vol.Required(CONF_HOME_SWITCH, default=d.get(CONF_HOME_SWITCH)): _ent(["switch", "binary_sensor", "input_boolean"]),
+            vol.Required(CONF_HOME_SWITCH, description={"suggested_value": d.get(CONF_HOME_SWITCH)}): _ent(["switch", "binary_sensor", "input_boolean"]),
             vol.Optional(CONF_SLEEP_SWITCH, description={"suggested_value": d.get(CONF_SLEEP_SWITCH)}): _ent(["switch", "input_boolean"]),
             vol.Optional(CONF_PRESENCE, description={"suggested_value": d.get(CONF_PRESENCE)}): _ent("binary_sensor"),
             vol.Optional(CONF_DOOR, description={"suggested_value": d.get(CONF_DOOR)}): _ent("binary_sensor"),
