@@ -39,6 +39,8 @@ class SoverSensor(SovnEntity, BinarySensorEntity):
             "armert": c.armed,
             "siden": c.last_change.isoformat() if c.last_change else None,
             "bryter": c.cfg.get("sleep_switch"),
+            "dorlas_aktiv": c.latched,
+            "dorlas_siden": c._latch_since.isoformat() if c._latch_since else None,
             **{f"obs_{k}": v for k, v in c.observations.items()},
         }
 

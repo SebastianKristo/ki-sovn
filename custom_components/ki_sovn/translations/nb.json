@@ -156,6 +156,9 @@
       },
       "av_etter": {
         "name": "Av etter"
+      },
+      "dorlas_bekreft": {
+        "name": "Dørlås bekreft innen"
       }
     },
     "time": {
@@ -229,6 +232,9 @@
       },
       "sondag_aktiv": {
         "name": "Søndag aktiv"
+      },
+      "dorlas": {
+        "name": "Dørlås"
       }
     },
     "button": {

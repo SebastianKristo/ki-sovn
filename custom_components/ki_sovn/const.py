@@ -39,6 +39,8 @@ CONF_HR_SLEEP = "hr_sleep_bpm"
 CONF_HR_AWAKE = "hr_awake_bpm"
 CONF_HR_FRESH_MIN = "hr_fresh_min"
 CONF_HR_WINDOW_MIN = "hr_window_min"
+CONF_DOOR_LATCH = "door_latch"            # presence som faller ut = fortsatt i rommet, helt til døra åpnes
+CONF_LATCH_CONFIRM_MIN = "latch_confirm_min"   # presence må vært på innen så mange min før døra lukkes
 
 PERSON_DEFAULTS = {
     CONF_BEDTIME_START: "22:00",
@@ -59,6 +61,8 @@ PERSON_DEFAULTS = {
     CONF_HR_AWAKE: 65,
     CONF_HR_FRESH_MIN: 60,
     CONF_HR_WINDOW_MIN: 20,
+    CONF_DOOR_LATCH: True,
+    CONF_LATCH_CONFIRM_MIN: 10,
 }
 
 # (P(obs|sover), P(obs|våken))
@@ -66,6 +70,7 @@ PROB = {
     "hjemme": (0.99, 0.55),
     "sovevindu": (0.95, 0.35),
     "i_rommet": (0.96, 0.30),
+    "i_rommet_laast": (0.98, 0.22),   # bekreftet av dørlåsen: sterkere enn en rå presence-treff
     "dor_lukket": (0.90, 0.25),
     "dor_lukket_natt_ok": (0.80, 0.40),
     "vindu_apent": (0.15, 0.30),
@@ -82,6 +87,7 @@ PERSON_NUMBERS = {
     CONF_PRESENCE_HYST: ("hold_i_rommet", 0, 120, 5, "min", 1),
     CONF_AWAY_ROOM_MIN: ("borte_fra_rommet", 5, 180, 5, "min", 1),
     CONF_DOOR_CLOSED_MIN: ("dor_lukket_min", 0, 120, 5, "min", 1),
+    CONF_LATCH_CONFIRM_MIN: ("dorlas_bekreft", 1, 60, 1, "min", 1),
     CONF_HR_SLEEP: ("puls_sover", 30, 100, 1, "bpm", 1),
     CONF_HR_AWAKE: ("puls_vaaken", 40, 150, 1, "bpm", 1),
 }
@@ -93,6 +99,7 @@ PERSON_TIMES = {
 PERSON_SWITCHES = {
     CONF_ENABLED: "automatisk",
     CONF_NIGHT_DOOR_OK: "dor_om_natta_ok",
+    CONF_DOOR_LATCH: "dorlas",
 }
 
 # ======================================================= Vekking (vekkealarm)

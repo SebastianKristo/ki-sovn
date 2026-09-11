@@ -38,6 +38,8 @@ from .const import (
     CONF_ON_DELAY,
     CONF_PRESENCE,
     CONF_PRESENCE_HYST,
+    CONF_DOOR_LATCH,
+    CONF_LATCH_CONFIRM_MIN,
     CONF_PRIOR,
     CONF_SLEEP_SWITCH,
     CONF_THRESHOLD,
@@ -101,6 +103,12 @@ class SovnCoordinator:
         self._pending_dir: bool | None = None
         self._pending_since: datetime | None = None
         self._last_presence_on: datetime | None = None
+        # Dørlås: når døra lukkes mens noen nettopp var registrert i rommet, vet vi at personen
+        # er der. Presence som faller ut etterpå betyr da bare at sensoren mistet personen –
+        # låsen står til døra faktisk åpnes igjen.
+        self._latch_since: datetime | None = None
+        self._latch_before_open: bool = False
+        self._i_rommet_kilde: str | None = None
         self._morning_door_opened: datetime | None = None
         self._hr_samples: deque[tuple[datetime, float]] = deque()
 
@@ -132,6 +140,10 @@ class SovnCoordinator:
             self._last_presence_on = now
         elif pres:
             self._last_presence_on = pres.last_changed
+        # Etter omstart: står døra lukket og presence er på, er personen bekreftet inne.
+        # Er presence av, vet vi ikke om hen gikk ut før omstarten – låsen settes da ikke.
+        if pres and pres.state == "on" and self._door_closed_now():
+            self._latch_since = now
 
         hr = self._state(CONF_HEART_RATE)
         if hr:
@@ -180,11 +192,38 @@ class SovnCoordinator:
 
         if entity_id == self._entity(CONF_PRESENCE) and new.state == "on":
             self._last_presence_on = now
+            # registrert i rommet med lukket dør → personen er inne, lås det fast
+            if self._door_closed_now() and self._latch_since is None:
+                self._latch_since = now
 
         elif entity_id == self._entity(CONF_HEART_RATE):
             self._push_hr(new)
 
+        elif entity_id == self._entity(CONF_DOOR) and new.state == "off":
+            # Døra lukket: var noen registrert i rommet like før, er personen inne nå.
+            siden = self._last_presence_on
+            pres = self._state(CONF_PRESENCE)
+            fersk = pres is not None and pres.state == "on"
+            if not fersk and siden is not None:
+                fersk = (now - siden) <= timedelta(minutes=self.cfg[CONF_LATCH_CONFIRM_MIN])
+            # Kort tur ut mens personen sov (do-tur): døra var åpen en liten stund, og hen var
+            # bekreftet i rommet før den ble åpnet. Da regnes hen som tilbake i senga selv om
+            # presence-sensoren ikke rekker å se det.
+            kort_tur = False
+            if not fersk and self._latch_before_open and self.sleeping:
+                apen_siden = event.data.get("old_state")
+                if apen_siden is not None:
+                    kort_tur = (now - apen_siden.last_changed) < timedelta(
+                        minutes=self.cfg[CONF_AWAY_ROOM_MIN]
+                    )
+            if fersk or kort_tur:
+                self._latch_since = now
+            self._latch_before_open = False
+
         elif entity_id == self._entity(CONF_DOOR) and new.state == "on":
+            # Døra åpnet: nå kan personen gå ut, så låsen slippes og presence bestemmer igjen.
+            self._latch_before_open = bool(self._latch_since)
+            self._latch_since = None
             if _in_window(now, self.cfg[CONF_MORNING_FROM], self.cfg[CONF_MORNING_TO]):
                 if self.cfg[CONF_NIGHT_DOOR_OK]:
                     self._morning_door_opened = now
@@ -200,21 +239,50 @@ class SovnCoordinator:
         await self._evaluate()
 
     # ------------------------------------------------------------------ logikk
+    def _door_closed_now(self) -> bool:
+        st = self._state(CONF_DOOR)
+        return st is not None and st.state == "off"
+
+    @property
+    def latched(self) -> bool:
+        """Er personen bekreftet i rommet av dørlåsen (presence + lukket dør, ingen døråpning etter)?"""
+        return bool(self.cfg.get(CONF_DOOR_LATCH, True) and self._latch_since and self._door_closed_now())
+
     def _presence_in_room(self, now: datetime) -> bool | None:
+        if self.latched:
+            self._i_rommet_kilde = "dørlås"
+            return True
         st = self._state(CONF_PRESENCE)
         if not st or st.state in ("unknown", "unavailable"):
+            self._i_rommet_kilde = None
             return None
         if st.state == "on":
+            self._i_rommet_kilde = "sensor"
             return True
         if self._last_presence_on is None:
+            self._i_rommet_kilde = None
             return False
-        return (now - self._last_presence_on) < timedelta(minutes=self.cfg[CONF_PRESENCE_HYST])
+        innen = (now - self._last_presence_on) < timedelta(minutes=self.cfg[CONF_PRESENCE_HYST])
+        self._i_rommet_kilde = "hysterese" if innen else None
+        return innen
 
     def _presence_off_for(self, now: datetime) -> timedelta | None:
+        """Hvor lenge presence har vært av – men bare hvis døra har vært åpnet i mellomtiden.
+
+        Med dørlåsen aktiv betyr presence som faller ut med lukket dør at sensoren mistet
+        personen, ikke at hen forlot rommet. Da returneres None, og «borte fra rommet»-regelen
+        får ikke vekke noen som fortsatt ligger i senga."""
+        if self.latched:
+            return None
         st = self._state(CONF_PRESENCE)
         if not st or st.state != "off":
             return None
-        return now - st.last_changed
+        siden = st.last_changed
+        dor = self._state(CONF_DOOR)
+        if self.cfg.get(CONF_DOOR_LATCH, True) and dor is not None and dor.state == "on":
+            # døra står åpen: regn fra det seneste av «presence av» og «døra åpnet»
+            siden = max(siden, dor.last_changed)
+        return now - siden
 
     def _heart_rate(self, now: datetime) -> tuple[bool | None, bool | None, float | None]:
         """Returnerer (puls_lav, puls_hoy, glattet)."""
@@ -258,6 +326,14 @@ class SovnCoordinator:
         cfg = self.cfg
 
         hjemme = self._bool_state(CONF_HOME_SWITCH)
+        pres_st = self._state(CONF_PRESENCE)
+        if pres_st is not None and pres_st.state == "on" and self._door_closed_now() and self._latch_since is None:
+            self._latch_since = now
+        if not self._door_closed_now():
+            self._latch_since = None
+        if hjemme is False:
+            self._latch_since = None      # borte fra huset → ingen lås å holde
+            self._latch_before_open = False
         sovevindu = _in_window(now, cfg[CONF_BEDTIME_START], cfg[CONF_BEDTIME_END])
         i_rommet = self._presence_in_room(now)
         # Når døra kan åpnes om natta teller den som lukket med en gang den lukkes,
@@ -273,7 +349,7 @@ class SovnCoordinator:
         obs = [
             (hjemme, *PROB["hjemme"]),
             (sovevindu, *PROB["sovevindu"]),
-            (i_rommet, *PROB["i_rommet"]),
+            (i_rommet, *PROB["i_rommet_laast" if self.latched else "i_rommet"]),
             (dor_lukket, *PROB[door_key]),
             (vindu_apent, *PROB["vindu_apent"]),
             (puls_lav, *PROB["puls_lav"]),
@@ -292,6 +368,8 @@ class SovnCoordinator:
             "puls_glattet": puls_glattet,
             "i_senga": i_senga,
         }
+        self.observations["i_rommet_kilde"] = self._i_rommet_kilde
+        self.observations["dorlas"] = self.latched or None
 
         # --- Tvungne vekkeregler ---
         if self.sleeping:

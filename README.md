@@ -27,9 +27,29 @@ fungerer uendret (samme unique_id og entitets-ID-er).
 | `binary_sensor.<navn>_sovn_sover` | on = sover. Attributter: `sannsynlighet`, `årsak`, `venter_på`, `siden`, `obs_*`, `prefix`, `bryter` |
 | `sensor.<navn>_sovn_sannsynlighet` | prosent |
 | `button.<navn>_sovn_sett_sover` / `_sett_vaken` | manuell overstyring (skriver til bryteren med en gang) |
-| `number.<navn>_sovn_terskel`, `_forsinkelse_sovner`, `_forsinkelse_vakner`, `_hold_i_rommet`, `_borte_fra_rommet_vaken`, `_dor_lukket_i`, `_puls_sover`, `_puls_vaken` | innstillinger, endres uten reload |
+| `number.<navn>_sovn_terskel`, `_forsinkelse_sovner`, `_forsinkelse_vakner`, `_hold_i_rommet`, `_borte_fra_rommet_vaken`, `_dor_lukket_i`, `_dorlas_bekreft`, `_puls_sover`, `_puls_vaken` | innstillinger, endres uten reload |
+| `switch.<navn>_sovn_dorlas` | dørlåsen på/av (standard på) |
 | `time.<navn>_sovn_sovevindu_start` / `_slutt` / `_morgen_fra` | tider |
 | `switch.<navn>_sovn_automatisk`, `_dor_om_natta_ok` | styring av bryteren / do-turer |
+
+### Dørlås – presence som mister personen
+Tilstedeværelsessensorer slutter ofte å se en person som ligger stille. Dørlåsen bruker døra som
+sannhetsvitne i stedet:
+
+- Var noen registrert i rommet (nå, eller innen `dorlas_bekreft` minutter) idet **døra ble lukket**,
+  er personen inne. Låsen settes.
+- Mens låsen står, betyr presence som faller ut bare at sensoren mistet personen. «I rommet» holdes
+  sann, får litt høyere vekt i beregningen, og regelen «borte fra rommet i N min» kan ikke vekke noen.
+- Låsen slippes først når **døra faktisk åpnes** – da bestemmer presence igjen, og nedtellingen for
+  «borte fra rommet» starter tidligst ved døråpningen.
+- Åpnes døra en liten stund mens personen sover (do-tur) og lukkes igjen innen
+  `borte_fra_rommet_vaken` minutter, settes låsen på nytt selv om presence ikke rakk å se hen komme
+  tilbake i senga.
+- Forsvinner personen fra huset, slippes låsen.
+
+Attributtene på `binary_sensor.<navn>_sovn_sover` viser `dorlas_aktiv`, `dorlas_siden` og
+`obs_i_rommet_kilde` (`sensor`, `dørlås` eller `hysterese`), så det er lett å se hva som holder
+«i rommet» oppe. Slå av med `switch.<navn>_sovn_dorlas` hvis du heller vil stole blindt på sensoren.
 
 Vekkeregler: forlater hjemmet → våken; borte fra rommet i N min → våken; dør åpnes i morgenvinduet → våken (eller etter N min borte
 hvis «dør om natta OK»); vekkealarm med «Vekk person» → våken når lyset er oppe.
