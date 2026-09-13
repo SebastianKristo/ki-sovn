@@ -235,6 +235,9 @@
       },
       "dorlas": {
         "name": "Dørlås"
+      },
+      "vindu_teller": {
+        "name": "Vindu teller"
       }
     },
     "button": {

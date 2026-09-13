@@ -29,6 +29,7 @@ from .const import (
     CONF_HR_FRESH_MIN,
     CONF_HR_SLEEP,
     CONF_HR_WINDOW_MIN,
+    CONF_WINDOW_COUNTS,
     CONF_MORNING_AWAY_MIN,
     CONF_MORNING_FROM,
     CONF_MORNING_TO,
@@ -351,7 +352,10 @@ class SovnCoordinator:
             (sovevindu, *PROB["sovevindu"]),
             (i_rommet, *PROB["i_rommet_laast" if self.latched else "i_rommet"]),
             (dor_lukket, *PROB[door_key]),
-            (vindu_apent, *PROB["vindu_apent"]),
+            # Sover man med vinduet åpent hele året, er det ikke tegn på å være våken.
+            # Bryteren «Vindu teller» kobler observasjonen ut av regnestykket; den vises
+            # fortsatt i observasjonslista og som merke på kortet.
+            (vindu_apent if cfg.get(CONF_WINDOW_COUNTS, True) else None, *PROB["vindu_apent"]),
             (puls_lav, *PROB["puls_lav"]),
             (puls_hoy, *PROB["puls_hoy"]),
             (i_senga, *PROB["i_senga"]),

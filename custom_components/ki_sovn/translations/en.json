@@ -235,6 +235,9 @@
       },
       "dorlas": {
         "name": "Dørlås"
+      },
+      "vindu_teller": {
+        "name": "Window counts"
       }
     },
     "button": {

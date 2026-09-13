@@ -38,6 +38,7 @@ CONF_DOOR_CLOSED_MIN = "door_closed_min"
 CONF_HR_SLEEP = "hr_sleep_bpm"
 CONF_HR_AWAKE = "hr_awake_bpm"
 CONF_HR_FRESH_MIN = "hr_fresh_min"
+CONF_WINDOW_COUNTS = "window_counts"    # teller åpent vindu som tegn på at man er våken?
 CONF_HR_WINDOW_MIN = "hr_window_min"
 CONF_DOOR_LATCH = "door_latch"            # presence som faller ut = fortsatt i rommet, helt til døra åpnes
 CONF_LATCH_CONFIRM_MIN = "latch_confirm_min"   # presence må vært på innen så mange min før døra lukkes
@@ -60,6 +61,7 @@ PERSON_DEFAULTS = {
     CONF_HR_SLEEP: 54,
     CONF_HR_AWAKE: 65,
     CONF_HR_FRESH_MIN: 60,
+    CONF_WINDOW_COUNTS: True,
     CONF_HR_WINDOW_MIN: 20,
     CONF_DOOR_LATCH: True,
     CONF_LATCH_CONFIRM_MIN: 10,
@@ -100,6 +102,7 @@ PERSON_SWITCHES = {
     CONF_ENABLED: "automatisk",
     CONF_NIGHT_DOOR_OK: "dor_om_natta_ok",
     CONF_DOOR_LATCH: "dorlas",
+    CONF_WINDOW_COUNTS: "vindu_teller",
 }
 
 # ======================================================= Vekking (vekkealarm)
